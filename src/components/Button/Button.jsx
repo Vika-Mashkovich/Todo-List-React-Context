@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './Button.scss';
+import noop from '../../entities/constants';
 
 const Button = ({ children, className, onClick }) => (
   <button className={className} onClick={onClick}>
@@ -14,10 +15,11 @@ Button.propTypes = {
   className: PropTypes.string,
   onClick: PropTypes.func,
 };
+
 Button.defaultProps = {
   children: '',
   className: '',
-  onClick: () => { },
+  onClick: noop,
 };
 
 export default Button;

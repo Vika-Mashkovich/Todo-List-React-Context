@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './core/App/App';
+import Launcher from './core/Launcher/Launcher';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Launcher>
     <App />
-  </React.StrictMode>,
+  </Launcher>,
   document.getElementById('root'),
 );
 

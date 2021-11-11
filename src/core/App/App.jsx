@@ -1,74 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import './App.scss';
 import Todo from '../../components/Todo/Todo';
 import Button from '../../components/Button/Button';
 import TaskApi from '../../api/tasksApi/provider';
-import Portal from '../../components/Portal/Portal';
 import Modal from '../../components/Modal/Modal';
+import { TaskContext } from '../contexts';
 
 const App = () => {
-  const [taskData, setTaskData] = useState([]);
-  const [edit, setEdit] = useState(null);
-  const [value, setValue] = useState('');
-  const [isModal, setIsModal] = useState(false);
+  const { taskData, value, isModal, setValue, setIsModal, changeTaskData } = useContext(TaskContext);
 
   useEffect(() => {
     TaskApi.getTask()
-      .then(setTaskData);
+      .then(changeTaskData);
   }, []);
 
-  const handlerOnDelete = (id) => {
-    const newTaskData = taskData.filter((item) => (item.id !== id));
+  const handleOpenModal = () => setIsModal(true);
 
-    setTaskData(newTaskData);
-  };
+  const handleOnCloseModal = () => setIsModal(false);
 
-  const handlerOnStatus = (id, status) => {
-    const newTaskData = taskData.map((item) => {
-      if (item.id === id) {
-        return { ...item, status: !status };
-      }
-
-      return item;
-    });
-
-    setTaskData(newTaskData);
-  };
-
-  const handlerOnEdit = (id, lable) => {
-    setEdit(id);
-    setValue(lable);
-  };
-
-  const handlerOnChange = (newValue) => (setValue(newValue));
-
-  const handlerOnSave = (id) => {
-    const newTaskData = taskData.map((item) => {
-      if (item.id === id) {
-        return { ...item, lable: value };
-      }
-
-      return item;
-    });
-
-    setTaskData(newTaskData);
-    setEdit(null);
-  };
-
-  const handlerOpenModal = () => setIsModal(true);
-
-  const handlerOnCloseModal = () => setIsModal(false);
-
-  const handlerOnSaveModal = () => {
+  const handleOnSaveModal = () => {
     const arrayId = taskData.map((item) => item.id);
     const idNewTask = Math.max(...arrayId) + 1;
 
-    taskData.push({
+    const newTask = {
       id: idNewTask,
       lable: value,
       status: false,
-    });
+    };
 
+    changeTaskData((prev) => [newTask, ...prev]);
     setIsModal(false);
   };
 
@@ -78,38 +38,27 @@ const App = () => {
       {
         isModal
         && (
-          <Portal>
-            <Modal onCloseModal={handlerOnCloseModal}>
-              <>
-                <div className='modal__title'>Task:</div>
-                <textarea onChange={(e) => setValue(e.target.value)} className='modal__field' />
-                <div className='modal__button'>
-                  <Button className='modal-save' onClick={() => handlerOnSaveModal()}>Save</Button>
-                  <Button className='modal-close' onClick={handlerOnCloseModal}>Cancel</Button>
-                </div>
-              </>
-            </Modal>
-          </Portal>
+          <Modal onCloseModal={handleOnCloseModal}>
+            <>
+              <div className='modal__title'>Task:</div>
+              <textarea onChange={(e) => setValue(e.target.value)} className='modal__field' />
+              <div className='modal__button'>
+                <Button className='modal-save' onClick={() => handleOnSaveModal()}>Save</Button>
+                <Button className='modal-close' onClick={handleOnCloseModal}>Cancel</Button>
+              </div>
+            </>
+          </Modal>
         )
       }
       <header className='App-header'>
-        <h1 className='header-lable'>TODO List Demo App</h1>
+        <h1 className='header-lable'>TODO List</h1>
         <span className='header-text'>Do it now.</span>
       </header>
       <main className='App-main'>
         <div className='main-button'>
-          <Button className='add-task' onClick={() => handlerOpenModal()}>Add Task</Button>
+          <Button className='add-task' onClick={() => handleOpenModal()}>Add Task</Button>
         </div>
-        <Todo
-          taskData={taskData}
-          onStatus={handlerOnStatus}
-          onDelete={handlerOnDelete}
-          onEdit={handlerOnEdit}
-          onChange={handlerOnChange}
-          onSave={handlerOnSave}
-          edit={edit}
-          value={value}
-        />
+        <Todo />
       </main>
     </div>
   );

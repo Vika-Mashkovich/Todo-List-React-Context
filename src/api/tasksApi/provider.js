@@ -1,9 +1,8 @@
 import { converter } from './converter';
 
 class TaskApi {
-  constructor({ url, token }) {
+  constructor({ url }) {
     this.url = url;
-    this.token = token;
   }
 
   getUrlWithQueries(queries) {
@@ -15,8 +14,8 @@ class TaskApi {
 
     return fetch(resultUrl)
       .then((response) => response.json())
-      .then((responseData) => converter(responseData));
-    // .catch(console.log());
+      .then((responseData) => converter(responseData))
+      .catch(() => []);
   }
 }
 

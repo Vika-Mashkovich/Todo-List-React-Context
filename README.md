@@ -1,3 +1,7 @@
+The Todo list is designed on React, using React Context and receives tasks from API jsonplaceholder.typicode.com.
+Typification through PropTypes.
+It is possible to add new tasks, edit existing ones, change a status and delete tasks.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

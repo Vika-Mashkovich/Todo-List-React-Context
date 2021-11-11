@@ -1,67 +1,77 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
 import './Todo.scss';
 import TodoItem from './TodoItem/TodoItem';
+import { TaskContext, ChangeTodoContext } from '../../core/contexts';
 
-const Todo = ({ taskData, onDelete, onStatus, onEdit, onChange, onSave, edit, value }) => {
-  let listItems = [];
+const Todo = () => {
+  const { taskData, value, setEdit, setValue, changeTaskData } = useContext(TaskContext);
 
-  if (taskData) {
-    listItems = taskData.map((item, index) => (
-      <TodoItem
-        key={item.id.toString()}
-        id={item.id}
-        number={index + 1}
-        lable={item.lable}
-        status={item.status}
-        onDelete={() => onDelete(item.id)}
-        onStatus={() => onStatus(item.id, item.status)}
-        onEdit={() => onEdit(item.id, item.lable)}
-        onChange={(newValue) => onChange(newValue)}
-        onSave={() => onSave(item.id)}
-        edit={edit}
-        value={value}
-      />
-    ));
-  }
+  const handleOnDelete = (id) => {
+    const newTaskData = taskData.filter((item) => (item.id !== id));
+
+    changeTaskData(newTaskData);
+  };
+
+  const handleOnChangeStatus = (id, status) => {
+    const newTaskData = taskData.map((item) => {
+      if (item.id === id) {
+        return { ...item, status: !status };
+      }
+
+      return item;
+    });
+
+    changeTaskData(newTaskData);
+  };
+
+  const handleOnEdit = (id, lable) => {
+    setEdit(id);
+    setValue(lable);
+  };
+
+  const handleOnChange = (newValue) => (setValue(newValue));
+
+  const handleOnSave = (id) => {
+    const newTaskData = taskData.map((item) => {
+      if (item.id === id) {
+        return { ...item, lable: value };
+      }
+
+      return item;
+    });
+
+    changeTaskData(newTaskData);
+    setEdit(null);
+  };
+
+  const listItems = taskData.map((item, index) => (
+    <TodoItem
+      key={item.id}
+      id={item.id}
+      number={index + 1}
+      lable={item.lable}
+      status={item.status}
+    />
+  ));
 
   return (
-    <>
-      <div className='Todo'>
-        <ul className='Todo-list'>
-          <li className='Todo-header'>
-            <span>#</span>
-            <span>Task Name</span>
-            <span>Status</span>
-            <span>Edit</span>
-            <span>Remove</span>
-          </li>
-          {listItems}
-        </ul>
-      </div>
-    </>
+    <ChangeTodoContext.Provider value={{ handleOnDelete, handleOnChangeStatus, handleOnEdit, handleOnChange, handleOnSave }}>
+      <>
+        <div className='Todo'>
+          <ul className='Todo-list'>
+            <li className='Todo-header'>
+              <span>№</span>
+              <span>Task Name</span>
+              <span>Status</span>
+              <span>Edit</span>
+              <span>Remove</span>
+            </li>
+            {listItems}
+          </ul>
+        </div>
+      </>
+    </ChangeTodoContext.Provider>
   );
-};
-
-Todo.propTypes = {
-  taskData: PropTypes.arrayOf(PropTypes.object),
-  onDelete: PropTypes.func,
-  onStatus: PropTypes.func,
-  onEdit: PropTypes.func,
-  onChange: PropTypes.func,
-  onSave: PropTypes.func,
-  edit: PropTypes.number,
-  value: PropTypes.string,
-};
-Todo.defaultProps = {
-  taskData: [],
-  onDelete: () => { },
-  onStatus: () => { },
-  onEdit: () => { },
-  onChange: () => { },
-  onSave: () => { },
-  edit: null,
-  value: '',
 };
 
 export default Todo;
